@@ -77,7 +77,7 @@ Correlation:
 ### Putting it all together
 
 ```typescript
-import { Regress } from "Callidus/Callidus";
+import { Regress } from "./Callidus/Callidus";
 
 var input = [1, 2, 3, 4, 5];
 var output = [2, 4, 8, 16, 32];
@@ -132,7 +132,7 @@ Predicting:
 
 Example 1:
 ```typescript
-import { Classify } from "Callidus/Callidus";
+import { Classify } from "./Callidus/Callidus";
 
 var input = [
     [1, 1, 1],
@@ -152,7 +152,7 @@ console.log(model.predict([1, 0, 1])); //=> 1, because the first element of the 
 
 Example 2:
 ```typescript
-import { Classify, Tools } from "Callidus/Callidus";
+import { Classify, Tools } from "./Callidus/Callidus";
 
 // aliases for the types (only for readability and ease-of-use; the types are so verbose for organization)
 const Stemmer = Tools.Porter2;

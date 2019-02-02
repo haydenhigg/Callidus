@@ -4,6 +4,8 @@ A collection of machine-learning algorithms for Typescript.
 
 Check [my website](http://www.thehiggy.com/static/callidus.html) to see a more intensive overview of the math and theory behind the algorithms.
 
+You can also get the Javascript version of this package on [NPM](https://npmjs.com/package/callidusjs).
+
 ## Notes:
 
 The object that you require has the objects `Regress`, `Classify`, `Cluster`, and `Tools`. 

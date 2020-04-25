@@ -43,7 +43,7 @@ export default class Porter {
     private static mgr1 = "^(" + Porter.C + ")?" + Porter.V + Porter.C + Porter.V + Porter.C;
     private static s_v = "^(" + Porter.C + ")?" + Porter.v;
 
-	static tokenize(text: string, punctuation = /[.,\/#!$%\^&\*;:{}=\-_`'~()\?]/g) {
+	static tokenize(text: string, punctuation = /[.,\/#!$%\^&\*;:{}=\-_`'~()\?"]/g) {
 		let words = text.toLowerCase().replace(punctuation, '').replace(/\s+/g, ' ').split(' ');
 
 		return words.map(Porter.stem);

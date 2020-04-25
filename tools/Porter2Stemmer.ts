@@ -228,7 +228,7 @@ export default class Porter2 {
 
     private static NORMALIZE_YS_RE = /Y/g;
 
-    static tokenize(text: string, punctuation = /[.,\/#!$%\^&\*;:{}=\-_`'~()\?"]/g) {
+    static tokenize(text: string, punctuation = /[.,\/#!$%\^&\*;:{}=\-_`'~()\?"“”]/g) {
 		let words = text.toLowerCase().replace(punctuation, '').replace(/\s+/g, ' ').split(' ');
 
 		return words.map(Porter2.stem);

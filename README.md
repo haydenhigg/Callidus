@@ -1,4 +1,4 @@
-# CallidusJS
+# Callidus
 
 A collection of machine-learning algorithms.
 

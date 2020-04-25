@@ -18,9 +18,36 @@ export default class OneR {
             throw new Error("you must train instance before calling `" + method + "`");
     }
 
-    train() {
+    private assertModelValidity(model) {
+        if (!model.input || !model.output || !model.rule)
+            throw new Error("JSON string in wrong form in `importJSON`");
+    }
+
+    exportJSON(space: number = 0) {
+        let jsonOb = {
+            input: this.input,
+            output: this.output,
+            rule: this.rule
+        };
+
+        return JSON.stringify(jsonOb, null, space)
+    }
+
+    importJSON(jsonOb: string) {
+        let model = JSON.parse(jsonOb);
+
+        this.assertModelValidity(model);
+
+        this.input = model.input;
+        this.output = model.output;
+        this.rule = model.rule;
+
         this.trained = true;
 
+        return this;
+    }
+
+    train() {
         var rules = {};
         var errors = {};
 

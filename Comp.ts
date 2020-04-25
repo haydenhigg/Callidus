@@ -73,6 +73,9 @@ export default class Comp {
     static getRange(arr: number[]) {
         return [this.min(arr), this.max(arr)];
     }
+    static makeRange(min: number, max: number) {
+        return [...Array(max - min + 1).keys()].map(i => i + min);
+    }
 
     // any[]
     static unique(arr: any[]) {
@@ -131,6 +134,114 @@ export default class Comp {
     }
     static randint(min: number, max: number) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // number[][]
+    static matrixOp(m1: number[][], m2: number[][], cb: (a: number, b: number) => number) {
+        var ret = [];
+
+        for (var row in m1) {
+            ret[row] = [];
+
+            for (var column in m1[row]) {
+                ret[row][column] = cb(m1[row][column], m2[row][column] || m2[row][m2[0].length - 1] || m2[row.length - 1][column] || m2[row.length - 1][column.length - 1]);
+            }
+        }
+
+        return ret;
+    }
+    static matrixMultiply(m1: number[][], m2: number[][]) {
+        var ret = [];
+
+        for (var i = 0; i < m1.length; i++) {
+            ret[i] = [];
+
+            for (var j = 0; j < m2[0].length; j++) {
+                var sum = 0;
+
+                for (var k = 0; k < m1[0].length; k++) {
+                    sum += m1[i][k] * m2[k][j];
+                }
+                
+                ret[i][j] = sum;
+            }
+        }
+
+        return ret;
+    }
+    static matrixTranspose(mat: number[][]) {
+        var ret = [];
+
+        for (var column in mat[0]) {
+            ret[column] = mat.map(row => row[column]);
+        }
+
+        return ret;
+    }
+    static matrixInverse(mat: number[][]) {
+        var dim = mat.length;
+        var I = [];
+        var C = [];
+        var e;
+
+        for(var i = 0; i < dim; i++) {
+            I.push([]);
+            C.push([]);
+
+            for (var j = 0; j < dim; j++) {
+                if (i==j)
+                    I[i][j] = 1;
+                else
+                    I[i][j] = 0;
+                
+                C[i][j] = mat[i][j];
+            }
+        }
+        
+        for(var i = 0; i < dim; i++) {
+            e = C[i][i];
+            
+            if (e == 0){
+                for(var ii = i + 1; ii < dim; ii++) {
+                    if(C[ii][i] != 0) {
+                        for (var j = 0; j < dim; j++) {
+                            e = C[i][j];        //temp store i'th row
+                            C[i][j] = C[ii][j]; //replace i'th row by ii'th
+                            C[ii][j] = e;       //repace ii'th by temp
+                            e = I[i][j];        //temp store i'th row
+                            I[i][j] = I[ii][j]; //replace i'th row by ii'th
+                            I[ii][j] = e;       //repace ii'th by temp
+                        }
+
+                        break;
+                    }
+                }
+
+                e = C[i][i];
+
+                if (e === 0)
+                    return;
+            }
+            
+            for (var j = 0; j < dim; j++) {
+                C[i][j] = C[i][j] / e; //apply to original matrix
+                I[i][j] = I[i][j] / e; //apply to identity
+            }
+            
+            for(var ii = 0; ii < dim; ii++) {
+                if ( ii === i)
+                    continue;
+
+                e = C[ii][i];
+
+                for(var j = 0; j < dim; j++) {
+                    C[ii][j] -= e * C[i][j]; //apply to original matrix
+                    I[ii][j] -= e * I[i][j]; //apply to identity
+                }
+            }
+        }
+
+        return I;
     }
 
     // functions/constants

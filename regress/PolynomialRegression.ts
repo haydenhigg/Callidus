@@ -1,18 +1,20 @@
 import Comp from "../Comp";
 
-export default class Linear {
+export default class Polynomial {
     input: number[];
     output: number[];
+    
+    degree: number;
 
-    slope: number = null;
-    yIntercept: number = null;
-    predictedOutput: number[] = [];
+    coefficients: number[];
+    predictedOutput: number[];
 
     private trained: boolean = false;
 
-    constructor(input: number[] = [], output: number[] = []) {
+    constructor(input: number[] = [], output: number[] = [], degree: number = 2) {
         this.input = input;
         this.output = output;
+        this.degree = degree;
     }
 
     private assertTrained(method = "predict") {
@@ -21,7 +23,7 @@ export default class Linear {
     }
 
     private assertModelValidity(model) {
-        if (!model.input || !model.output || !model.a || !model.b || !model.predOut)
+        if (!model.input || !model.output || !model.deg || !model.coefficients || !model.predOut)
             throw new Error("JSON string in wrong form in `importJSON`");
     }
 
@@ -29,8 +31,8 @@ export default class Linear {
         let jsonOb = {
             input: this.input,
             output: this.output,
-            a: this.slope,
-            b: this.yIntercept,
+            deg: this.degree,
+            coefficients: this.coefficients,
             predOut: this.predictedOutput
         };
 
@@ -44,8 +46,8 @@ export default class Linear {
 
         this.input = model.input;
         this.output = model.output;
-        this.slope = model.a;
-        this.yIntercept = model.b;
+        this.degree = model.deg;
+        this.coefficients = model.coefficients;
         this.predictedOutput = model.predOut;
 
         this.trained = true;
@@ -79,27 +81,19 @@ export default class Linear {
     }
 
     train() {
-        var sumX = 0;
-        var sumY = 0;
-        var sumXX = 0;
-        var sumXY = 0;
+        var coefficientInits = this.input.map(i => Comp.makeRange(0, this.degree).map(power => i ** power));
 
-        var n = this.input.length;
+        let t = Comp.matrixTranspose;
+        let inv = Comp.matrixInverse;
+        let mult = Comp.matrixMultiply;
 
-        for (var i = 0; i < n; i++) {
-            let x = this.input[i];
-            let y = this.output[i];
+        let mx = coefficientInits;
+        let my = this.output.map(y => [y]);
+        let mxt = t(mx);
 
-            sumX += x;
-            sumY += y;
-            sumXX += x * x;
-            sumXY += x * y
-        }
+        this.coefficients = t(mult(mult(inv(mult(mxt, mx)), mxt), my))[0].map(i => Comp.roundTo(i));
 
-        this.slope = Comp.roundTo((n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX));
-        this.yIntercept = Comp.roundTo((sumY - (this.slope * sumX)) / n);
-
-        this.predictedOutput = Comp.unique(this.input).map(x => Comp.roundTo(x * this.slope + this.yIntercept));
+        this.predictedOutput = this.input.map(x => Comp.roundTo(this.coefficients.reduce((s, c, i) => s + (c * (x ** i)))));
 
         this.trained = true;
 
@@ -109,6 +103,6 @@ export default class Linear {
     predict(x: number) {
         this.assertTrained();
 
-        return Comp.roundTo(x * this.slope + this.yIntercept);
+        return this.coefficients.reduce((s, c, i) => s + (c * (x ** i)));
     }
 };

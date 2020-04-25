@@ -20,11 +20,48 @@ export default class Power {
             throw new Error("you must train instance before calling `" + method + "`");
     }
 
+    private assertModelValidity(model) {
+        if (!model.input || !model.output || !model.a || !model.b || !model.predOut)
+            throw new Error("JSON string in wrong form in `importJSON`");
+    }
+
+    exportJSON(space: number = 0) {
+        let jsonOb = {
+            input: this.input,
+            output: this.output,
+            a: this.a,
+            b: this.b,
+            predOut: this.predictedOutput
+        };
+
+        return JSON.stringify(jsonOb, null, space)
+    }
+
+    importJSON(jsonOb: string) {
+        let model = JSON.parse(jsonOb);
+
+        this.assertModelValidity(model);
+
+        this.input = model.input;
+        this.output = model.output;
+        this.a = model.a;
+        this.b = model.b;
+        this.predictedOutput = model.predOut;
+
+        this.trained = true;
+
+        return this;
+    }
+
     findCorrelation() {
         this.assertTrained("findCorrelation");
 
         var meanLnY = Comp.mean(this.output.map(i => Math.log(i)));
         var meanLnX = Comp.mean(this.input.map(i => Math.log(i)));
+
+        if (meanLnX === Infinity || meanLnY === Infinity) {
+            throw new Error("can not find ln(0)");
+        }
 
         var sumXX = 0;
         var sumXY = 0;
@@ -59,12 +96,16 @@ export default class Power {
             diffs.push((this.predictedOutput[i] - this.output[i]) ** 2);
         }
 
-        return Comp.roundTo(Math.sqrt(Comp.sum(diffs) / (n - 2)));
+        return 1 - Comp.roundTo(1 - Math.sqrt(Comp.sum(diffs) / (n - 2)));
     }
 
     train() {
         var meanLnY = Comp.mean(this.output.map(i => Math.log(i)));
         var meanLnX = Comp.mean(this.input.map(i => Math.log(i)));
+
+        if (meanLnX === Infinity || meanLnY === Infinity) {
+            throw new Error("can not find ln(0)");
+        }
 
         var sumXX = 0;
         var sumXY = 0;
@@ -88,7 +129,7 @@ export default class Power {
         this.b = sumXY / sumXX;
         this.a = Comp.e ** (meanLnY - this.b * meanLnX);
 
-        this.predictedOutput = this.input.map(x => Comp.roundTo(this.a * (x ** this.b)));
+        this.predictedOutput = Comp.unique(this.input).map(x => Comp.roundTo(this.a * (x ** this.b)));
 
         this.trained = true;
 

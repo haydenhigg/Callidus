@@ -18,6 +18,7 @@ import ZeroR from "./classify/rules/ZeroR";
 import OneR from "./classify/rules/OneR";
 
 // trees and boosting
+/* don't import these yet they aren't done */
 
 /////////////
 // Regress ////////////////////////////////////////////////////////////////////////////////////////
@@ -30,6 +31,7 @@ import Logarithmic from "./regress/LogarithmicRegression";
 import Power from "./regress/PowerRegression";
 import Inverse from "./regress/InverseRegression";
 import Quadratic from "./regress/QuadraticRegression";
+import Polynomial from "./regress/PolynomialRegression";
 
 /////////////
 // Cluster ////////////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +76,8 @@ var Regress = {
     Logarithmic,
     Power,
     Inverse,
-    Quadratic
+    Quadratic,
+    Polynomial
 };
 
 var Cluster = {

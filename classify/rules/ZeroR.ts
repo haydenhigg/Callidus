@@ -7,6 +7,27 @@ export default class ZeroR {
         this.output = output;
     }
 
+    private assertModelValidity(model) {
+        if (!model.output)
+            throw new Error("JSON string in wrong form in `importJSON`");
+    }
+
+    exportJSON(space: number = 0) {
+        let jsonOb = {output: this.output};
+
+        return JSON.stringify(jsonOb, null, space)
+    }
+
+    importJSON(jsonOb: string) {
+        let model = JSON.parse(jsonOb);
+
+        this.assertModelValidity(model);
+
+        this.output = model.output;
+
+        return this;
+    }
+
     predict() {
         var score = {};
 

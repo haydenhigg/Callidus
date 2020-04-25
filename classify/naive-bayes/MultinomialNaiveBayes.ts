@@ -19,6 +19,37 @@ export default class MultinomialNB {
             throw new Error("you must train instance before calling `" + method + "`");
     }
 
+    private assertModelValidity(model) {
+        if (!model.input || !model.output || !model.prior || !model.condprob)
+            throw new Error("JSON string in wrong form in `importJSON`");
+    }
+
+    exportJSON(space: number = 0) {
+        let jsonOb = {
+            input: this.input,
+            output: this.output,
+            prior: this.prior,
+            condprob: this.condprob
+        };
+
+        return JSON.stringify(jsonOb, null, space)
+    }
+
+    importJSON(jsonOb: string) {
+        let model = JSON.parse(jsonOb);
+
+        this.assertModelValidity(model);
+
+        this.input = model.input;
+        this.output = model.output;
+        this.prior = model.prior;
+        this.condprob = model.condprob;
+
+        this.trained = true;
+
+        return this;
+    }
+
     train() {
         for (let c of Comp.unique(this.output)) {
             let vocabulary = Comp.unique(Comp.flatten(this.input));

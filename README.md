@@ -1,10 +1,6 @@
-# Callidus
+# CallidusJS
 
-A collection of machine-learning algorithms for Typescript.
-
-Check [my website](http://www.thehiggy.com/static/callidus.html) to see a more intensive overview of the math and theory behind the algorithms.
-
-You can also get the Javascript version of this package on [NPM](https://npmjs.com/package/callidusjs).
+A collection of machine-learning algorithms.
 
 ## Notes:
 
@@ -19,6 +15,7 @@ The object that you require has the objects `Regress`, `Classify`, `Cluster`, an
 - [`Power`](https://keisan.casio.com/exec/system/14059931777261)
 - [`Quadratic`](https://keisan.casio.com/exec/system/14059932254941)
 - [`Inverse`](https://keisan.casio.com/exec/system/14059932105271)
+- [`Polynomial`](https://rosettacode.org/wiki/Polynomial_regression#Ruby)
 &nbsp;
 
 `Classify` has
@@ -56,7 +53,8 @@ These are algorithms for finding the best fit line between arrays of inputs/outp
 
 Input and output must both be arrays of numbers.
 
-- All: `constructor([input = [], output = []])`
+- `Polynomial`: `constructor([input = [], output = [], degree = 2])`
+- Others: `constructor([input = [], output = []])`
 
 ### Training
 
@@ -66,7 +64,7 @@ Training:
 ### Predicting
 
 Predicting:
-- All: `predict()`
+- All: `predict(x)`
 
 ### Getting error and correlation
 
@@ -78,8 +76,8 @@ Correlation:
 
 ### Putting it all together
 
-```typescript
-import { Regress } from "./Callidus/Callidus";
+```javascript
+const { Regress } = require("callidusjs");
 
 var input = [1, 2, 3, 4, 5];
 var output = [2, 4, 8, 16, 32];
@@ -133,8 +131,8 @@ Predicting:
 ### Putting it all together
 
 Example 1:
-```typescript
-import { Classify } from "./Callidus/Callidus";
+```javascript
+const { Classify } = require("callidusjs");
 
 var input = [
     [1, 1, 1],
@@ -153,10 +151,10 @@ console.log(model.predict([1, 0, 1])); //=> 1, because the first element of the 
 &nbsp;
 
 Example 2:
-```typescript
-import { Classify, Tools } from "./Callidus/Callidus";
+```javascript
+const { Classify, Tools } = require("callidusjs");
 
-// aliases for the types (only for readability and ease-of-use; the types are so verbose for organization)
+// aliases for the types (for readability and ease-of-use; the types are only so verbose in an effort to organize)
 const Stemmer = Tools.Porter2;
 const Classifier = Classify.NaiveBayes.Multinomial;
 
@@ -174,7 +172,7 @@ var model = new Classifier(input, output);
 model.train();
 
 console.log(model.predict(Stemmer.tokenize("Another sentence (guess what language this is in!)"))); //=> english
-console.log(model.predict(Stemmer.tokenize("Une autre phrase (devine quelle langue ceci est!)"))); //=> french
+console.log(model.predict(Stemmer.tokenize("Une autre phrase (devine en quelle langue ceci est!)"))); //=> french
 ```
 
 ## Cluster
@@ -213,3 +211,11 @@ A classic stemming algorithm. Use the static methods `stem(word)` to find the st
 ### Porter2
 
 The newer, revised version of `Porter`. It has exactly the same interface as `Porter` for stemming and tokenizing.
+
+## Saving and Loading Models
+
+All models can be transformed to and from JSON-format strings using these instance methods:
+- Saving: `exportJSON([jsonFormattingSpaces = 0])`
+- Loading: `importJSON(jsonOb)`
+
+Note: the method `importJSON` will automatically set applicable algorithms' `trained` property to true, whether the model that the state was saved from was trained or not.

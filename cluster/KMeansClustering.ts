@@ -9,6 +9,31 @@ export default class KMeans {
         this.input = input;
     }
 
+    private assertModelValidity(model) {
+        if (!model.input || !model.centroids)
+            throw new Error("JSON string in wrong form in `importJSON`");
+    }
+
+    exportJSON(space: number = 0) {
+        let jsonOb = {
+            input: this.input,
+            centroids: this.centroids
+        };
+
+        return JSON.stringify(jsonOb, null, space)
+    }
+
+    importJSON(jsonOb: string) {
+        let model = JSON.parse(jsonOb);
+
+        this.assertModelValidity(model);
+
+        this.input = model.input;
+        this.centroids = model.centroids;
+
+        return this;
+    }
+
     train(k, maxIterations = 10000) {
         this.centroids = this.centroids || Array.from(Array(k), () => this.input[0].map((_, i) => Comp.randRange(this.input.map(inp => inp[i]))));
 

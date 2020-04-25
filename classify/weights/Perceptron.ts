@@ -22,6 +22,37 @@ export default class Perceptron {
             throw new Error("you must train instance before calling `" + method + "`");
     }
 
+    private assertModelValidity(model) {
+        if (!model.input || !model.output || !model.a || !model.weights)
+            throw new Error("JSON string in wrong form in `importJSON`");
+    }
+
+    exportJSON(space: number = 0) {
+        let jsonOb = {
+            input: this.input,
+            output: this.output,
+            a: this.a,
+            weights: this.weights
+        };
+
+        return JSON.stringify(jsonOb, null, space)
+    }
+
+    importJSON(jsonOb: string) {
+        let model = JSON.parse(jsonOb);
+
+        this.assertModelValidity(model);
+
+        this.input = model.input;
+        this.output = model.output;
+        this.a = model.a;
+        this.weights = model.weights;
+
+        this.trained = true;
+
+        return this;
+    }
+
     train(gamma: number, maxIterations: number = 10000) {
         var c = 0;
 
@@ -71,7 +102,7 @@ export default class Perceptron {
                 let yj = Comp.dot(this.weights, this.input[j]);
 
                 let diff = dj - yj;
-
+                
                 for (var i = 0; i < n2; i++) this.weights[i] += this.a * (diff * this.input[j][i]);
             }
         }

@@ -21,6 +21,41 @@ export default class Quadratic {
             throw new Error("you must train instance before calling `" + method + "`");
     }
 
+    private assertModelValidity(model) {
+        if (!model.input || !model.output || !model.a || !model.b || !model.c || !model.predOut)
+            throw new Error("JSON string in wrong form in `importJSON`");
+    }
+
+    exportJSON(space: number = 0) {
+        let jsonOb = {
+            input: this.input,
+            output: this.output,
+            a: this.a,
+            b: this.b,
+            c: this.c,
+            predOut: this.predictedOutput
+        };
+
+        return JSON.stringify(jsonOb, null, space)
+    }
+
+    importJSON(jsonOb: string) {
+        let model = JSON.parse(jsonOb);
+
+        this.assertModelValidity(model);
+
+        this.input = model.input;
+        this.output = model.output;
+        this.a = model.a;
+        this.b = model.b;
+        this.c = model.c;
+        this.predictedOutput = model.predOut;
+
+        this.trained = true;
+
+        return this;
+    }
+
     findCorrelation() {
         this.assertTrained("findCorrelation");
 
@@ -51,7 +86,7 @@ export default class Quadratic {
             diffs.push((this.predictedOutput[i] - this.output[i]) ** 2);
         }
 
-        return Comp.roundTo(Math.sqrt(Comp.sum(diffs) / (n - 2)));
+        return 1 - Comp.roundTo(1 - Math.sqrt(Comp.sum(diffs) / (n - 2)));
     }
 
     train() {
@@ -88,7 +123,7 @@ export default class Quadratic {
         this.c = (sumX2Y * sumXX - sumXY * sumXX2) / (sumXX * sumX2X2 - sumXX2 * sumXX2);
         this.a = meanY - this.b * meanX - this.c * meanX2;
 
-        this.predictedOutput = this.input.map(x => Comp.roundTo(this.a + this.b * x + this.c * x * x));
+        this.predictedOutput = Comp.unique(this.input).map(x => Comp.roundTo(this.a + this.b * x + this.c * x * x));
 
         this.trained = true;
 
